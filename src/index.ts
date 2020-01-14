@@ -21,7 +21,6 @@ async function run() {
     app.use(bodyParser.json());
 
     app.use('/api', apiController);
-    app.get('/get', (req, res) => res.send('hello world'));
 
     app.listen(8080, () => {
         console.log(`application listening on port 8080...`);
