@@ -20,6 +20,7 @@ export const auth = {
     }),    
 }
 
+// extend Express.Request with the CurrentUser object so we can use it after authorizing.
 declare module 'express-serve-static-core' {
     interface Request {
         [userProperty]: CurrentUser;
