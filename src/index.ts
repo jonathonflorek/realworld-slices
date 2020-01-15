@@ -2,19 +2,21 @@ import 'reflect-metadata';
 import * as express from 'express';
 import { apiController } from './features/routes';
 import { createConnection } from 'typeorm';
-import { UserEntity } from './models/UserEntity';
 import * as bodyParser from 'body-parser';
 import * as cors from 'cors';
+import { postgresConfig } from './config';
 
 async function run() {
     await createConnection({
-        type: 'sqlite',
-        database: ':memory:',
+        type: 'postgres',
+        ...postgresConfig,
+
         dropSchema: true,
-        entities: [UserEntity],
-        synchronize: true,
+        entities: ['dist/models/*.js'],
+        migrations: ['dist/migrations/*.js'],
+        migrationsRun: true,
         logging: false,
-    })
+    });
 
     const app = express();
     app.use(cors());
