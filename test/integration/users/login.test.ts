@@ -53,6 +53,5 @@ describe('Endpoint test for login: POST /users/login', () => {
                 image: '',
             });
             expect(result.body?.user?.token).to.be.a('string');
-
         });
 });
