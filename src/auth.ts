@@ -3,7 +3,7 @@ import { secret } from './config';
 import { Request } from 'express-serve-static-core';
 import { CurrentUser } from './types';
 
-function getTokenFromHeader(req: Request) {
+export function getTokenFromHeader(req: Request) {
     if (!req.headers.authorization) {
         return null;
     }
