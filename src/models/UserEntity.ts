@@ -1,4 +1,5 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
+import { ArticleEntity } from './ArticleEntity';
 
 @Entity('user')
 export class UserEntity {
@@ -22,4 +23,7 @@ export class UserEntity {
 
     @Column()
     public hash: string = '';
+
+    @OneToMany(type => ArticleEntity, article => article.author)
+    public articles: ArticleEntity = undefined as any;
 }

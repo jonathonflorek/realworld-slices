@@ -26,6 +26,7 @@
     "jsonwebtoken": "^8.5.1",
     "pg": "^7.17.1",
     "reflect-metadata": "^0.1.13",
+    "slug": "^2.1.0",
     "typeorm": "^0.2.22",
     "validate-typescript": "^4.0.2"
   },
@@ -37,6 +38,7 @@
     "@types/express-jwt": "0.0.42",
     "@types/jsonwebtoken": "^8.3.6",
     "@types/mocha": "^5.2.7",
+    "@types/slug": "^0.9.1",
     "chai": "^4.2.0",
     "chai-http": "^4.3.0",
     "dotenv": "^8.2.0",
