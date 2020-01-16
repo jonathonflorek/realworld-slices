@@ -42,7 +42,7 @@ describe('Endpoint test for articles: POST /articles', () => {
                 .auth(token, { type: 'bearer' })
                 .send(article);
             
-            const allArticles = await getRepository(ArticleEntity).find({ relations: ['author'] });
+            const articlesInDB = await getRepository(ArticleEntity).find({ relations: ['author'] });
 
             // Assert
 
@@ -53,14 +53,15 @@ describe('Endpoint test for articles: POST /articles', () => {
                 body: 'This article discusses testing with an example implementation of the Realworld.io backend API. Lorem ipsum etcetera etcetera etcetera.',
                 tagList: ['test', 'testing', 'integration'],
             });
-            expect(allArticles).to.have.lengthOf(1)
-            expect(allArticles[0]).to.deep.include({
+            
+            expect(articlesInDB).to.have.lengthOf(1)
+            expect(articlesInDB[0]).to.deep.include({
                 title: 'Integration testing 101',
                 description: 'How to perform integration tests with mocha + chai',
                 body: 'This article discusses testing with an example implementation of the Realworld.io backend API. Lorem ipsum etcetera etcetera etcetera.',
                 tagList: ['test', 'testing', 'integration'],
             });
-            expect(allArticles[0].author).to.include({
+            expect(articlesInDB[0].author).to.include({
                 username: 'username',
                 email: 'username@realworld.io',
             });
