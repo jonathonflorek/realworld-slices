@@ -32,10 +32,15 @@ interface SampleRepository {
     getSample(id: string): Sample
     getSamplesForUseCaseA(id: string, code: number): Sample[]
     getSampleForUseCaseB(key: string): Sample
+    ...
 }
 ```
 
-This is single-responsibility in terms of its layer (data access) but not SRP in terms of what it does. The approach in this project is the opposite: it is SRP in terms of use case but not in terms of layer. If the above interface is SRP then this project is what you get when you say 'reverse the polarity'.
+This is not SRP as it has at least two reasons to change: Use Case A and B.
+
+While every feature has to be modified if we change database drivers in this project's layout, we can iteratively migrate features one-by-one to new drivers in small commits instead of a big bang refactoring of all the repositories at once in a long-running branch.
+
+This explanation is a very brief overview of concepts disussed in much greater clarity in [this](https://vimeo.com/131633177) talk.
 
 ## See Also
 
