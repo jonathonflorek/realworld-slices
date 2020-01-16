@@ -42,7 +42,7 @@ describe('Endpoint test for users: POST /users', () => {
         // Assert
 
         expect(registrationResult, 'registration result status not OK').to.have.status(OK);
-        expect(registrationResult.body?.user).to.deep.include({
+        expect(registrationResult.body?.user).to.include({
             email: 'sample.user@mydomain.com',
             username: 'John F Doe',
             bio: '',
