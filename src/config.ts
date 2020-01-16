@@ -1,6 +1,7 @@
 export const secret = required('REALWORLD_SECRET');
 
 export const postgresConfig = {
+    type: 'postgres' as const,
     port: Number(required('POSTGRES_PORT')),
     host: required('POSTGRES_HOST'),
     database: required('POSTGRES_DATABASE'),

@@ -11,14 +11,10 @@ const running = start(app);
 
 async function start(app: express.Application) {
     await createConnection({
-        type: 'postgres',
         ...postgresConfig,
-
-        dropSchema: true,
         entities: ['dist/models/*.js'],
         migrations: ['dist/migrations/*.js'],
         migrationsRun: true,
-        logging: false,
     });
 
     app.use(cors());
