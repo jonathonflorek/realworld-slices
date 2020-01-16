@@ -58,6 +58,7 @@ export async function handleArticlePost(
     const article = new ArticleEntity();
     article.title = data.title;
     article.description = data.description;
+    article.body = data.body;
     article.slug = getSlug(data.title);
     article.tagList = data.tagList;
     article.author = author;
