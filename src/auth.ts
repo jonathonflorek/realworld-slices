@@ -4,9 +4,15 @@ import { Request } from 'express-serve-static-core';
 import { CurrentUser } from './types';
 
 function getTokenFromHeader(req: Request) {
-    if (req.headers.authorization && req.headers.authorization.split(' ')[0] === 'Token') {
-        return req.headers.authorization.split(' ')[1];
+    if (!req.headers.authorization) {
+        return null;
     }
+
+    const [type, token] = req.headers.authorization.split(' ');
+    if (['token', 'bearer'].includes(type.toLowerCase())) {
+        return token;
+    }
+
     return null;
 }
 

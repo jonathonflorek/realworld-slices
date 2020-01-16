@@ -6,7 +6,10 @@ import * as bodyParser from 'body-parser';
 import * as cors from 'cors';
 import { postgresConfig } from './config';
 
-async function run() {
+const app = express();
+const running = start(app);
+
+async function start(app: express.Application) {
     await createConnection({
         type: 'postgres',
         ...postgresConfig,
@@ -18,15 +21,20 @@ async function run() {
         logging: false,
     });
 
-    const app = express();
     app.use(cors());
     app.use(bodyParser.json());
 
     app.use('/api', apiController);
 
-    app.listen(8080, () => {
-        console.log(`application listening on port 8080...`);
+    await new Promise(resolve => {
+        app.listen(8080, () => {
+            console.log(`application listening on port 8080...`);
+            resolve();
+        });
     });
 }
 
-run();
+export {
+    app,
+    running,
+};

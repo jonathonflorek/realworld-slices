@@ -25,7 +25,7 @@ usersController.post('/', async (req, res) => {
             res.status(422).json(error('email taken'));
             break;
         case 'usernameTaken':
-            res.status(422).json(error('username taken'));
+            res.status(422).json(error(`The username '${response.payload.username}' is taken.`));
             break;
     }
 });
