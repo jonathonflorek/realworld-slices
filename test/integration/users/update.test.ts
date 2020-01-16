@@ -73,6 +73,13 @@ describe('Endpoint test for users: PUT /users', () => {
             // Assert
 
             expect(changePasswordResult).to.have.status(OK);
+            expect(changePasswordResult.body?.user).to.include({
+                email: 'sample.user@mydomain.com',
+                username: 'John F Doe',
+                bio: 'lorem ipsum sample test debug',
+                image: '',
+            });
+            expect(changePasswordResult.body?.user?.token).to.be.a('string');
             expect(newLoginResult).to.have.status(OK);
         });
 })

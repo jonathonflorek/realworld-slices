@@ -6,6 +6,7 @@ import { validate } from 'validate-typescript';
 import { userRegisterSchema, handleUserRegister } from './register';
 import { userLoginSchema, handleUserLogin } from './login';
 import { UserResponse } from './shared';
+import { userUpdateSchema, handleUserUpdate } from './update';
 
 const usersController = Router();
 
@@ -45,6 +46,20 @@ usersController.post('/login', async (req, res) => {
             break;
     }
 });
+
+usersController.put('/', auth.required, async (req, res) => {
+    const userUpdate = validate(userUpdateSchema, req.body);
+    const response = await handleUserUpdate(
+        req.user,
+        getManager(),
+        userUpdate,
+    );
+    switch(response.type) {
+        case 'success':
+            res.status(200).json(user(response));
+            break;
+    }
+})
 
 function user({ payload }: { payload: UserResponse }) {
     return { user: payload };
