@@ -8,13 +8,8 @@ import { update } from './update';
 const usersController = Router();
 
 usersController.get('/', auth.required, get);
-
 usersController.post('/', register);
-
 usersController.post('/login', login);
-
 usersController.put('/', auth.required, update);
 
-export {
-    usersController
-};
+export { usersController };
