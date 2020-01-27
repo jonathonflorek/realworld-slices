@@ -1,5 +1,7 @@
 import 'reflect-metadata';
 import * as express from 'express';
+import 'express-async-errors';
+
 import { apiController } from './features/routes';
 import { createConnection } from 'typeorm';
 import * as bodyParser from 'body-parser';
