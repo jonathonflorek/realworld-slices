@@ -10,7 +10,7 @@
     "migration:revert": "npm run build && typeorm migration:revert",
     "migration:generate": "npm run migration:run && typeorm migration:generate -n",
     "migration:run": "npm run build && typeorm migration:run",
-    "test": "npm run test:unit && npm run test:integration",
+    "test": "npm run build && npm run test:unit && npm run test:integration",
     "test:unit": "env-cmd -f test.env mocha \"test/unit/**/*.test.ts\"",
     "test:integration": "env-cmd -f test.env mocha \"test/integration/**/*.test.ts\""
   },
