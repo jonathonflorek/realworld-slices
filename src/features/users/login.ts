@@ -1,28 +1,20 @@
-import { Primitive } from 'validate-typescript';
-import { EntityManager } from 'typeorm';
+import { Primitive, validate } from 'validate-typescript';
+import { getManager } from 'typeorm';
 import { UserEntity } from '../../models/UserEntity';
-import { isValidPassword, getToken, UserResponse } from './shared';
-import { resultFactory } from '../../util';
+import { isValidPassword, getToken } from './shared';
+import { Request, Response } from 'express';
 
-export const userLoginSchema = {
+const userLoginSchema = {
     user: {
         email: Primitive(String),
         password: Primitive(String),
     },
 };
 
-interface UserLoginResults {
-    success: UserResponse;
-    userDoesNotExist: true;
-    passwordIncorrect: true;
-}
+export async function login(req: Request, res: Response) {
+    const userLogin = validate(userLoginSchema, req.body);
+    const manager = getManager();
 
-const result = resultFactory<UserLoginResults>();
-
-export async function handleUserLogin(
-    manager: EntityManager,
-    userLogin: typeof userLoginSchema,
-) {
     const {
         email,
         password,
@@ -34,19 +26,25 @@ export async function handleUserLogin(
     );
 
     if (!user) {
-        return result('userDoesNotExist', true);
+        return res.status(404).json({
+            errors: { body: ['user does not exist'] },
+        });
     }
 
     if (!isValidPassword(user, password)) {
-        return result('passwordIncorrect', true);
+        return res.status(401).json({
+            errors: { body: ['password is incorrect'] },
+        });
     }
 
     const token = getToken(user);
-    return result('success', {
-        username: user.username,
-        token,
-        email,
-        bio: user.bio,
-        image: user.image,
+    return res.status(200).json({
+        user: {
+            username: user.username,
+            token,
+            email,
+            bio: user.bio,
+            image: user.image,
+        },
     });
 }

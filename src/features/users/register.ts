@@ -4,7 +4,7 @@ import { UserEntity } from '../../models/UserEntity';
 import { getSaltHash, getToken } from './shared';
 import { Request, Response } from 'express';
 
-export const userRegisterSchema = {
+const userRegisterSchema = {
     user: {
         username: Primitive(String),
         email: Primitive(String),

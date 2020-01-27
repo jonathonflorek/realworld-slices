@@ -1,19 +1,12 @@
-import { EntityManager } from 'typeorm';
-import { CurrentUser } from '../../types';
-import { UserResponse, getToken } from './shared';
-import { resultFactory } from '../../util';
+import { getManager } from 'typeorm';
+import { getToken } from './shared';
 import { UserEntity } from '../../models/UserEntity';
+import { Request, Response } from 'express';
 
-interface GetUserResult {
-    success: UserResponse;
-}
+export async function get(req: Request, res: Response) {
+    const currentUser = req.user;
+    const manager = getManager();
 
-const result = resultFactory<GetUserResult>();
-
-export async function handleGetUser(
-    currentUser: CurrentUser,
-    manager: EntityManager,
-) {
     const { id } = currentUser;
 
     const user = await manager.findOne(UserEntity, { id });
@@ -23,11 +16,13 @@ export async function handleGetUser(
     }
 
     const token = getToken(user);
-    return result('success', {
-        username: user.username,
-        token,
-        email: user.email,
-        bio: user.bio,
-        image: user.image,
+    return res.status(200).json({
+        user: {
+            username: user.username,
+            token,
+            email: user.email,
+            bio: user.bio,
+            image: user.image,
+        },
     });
 }

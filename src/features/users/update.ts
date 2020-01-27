@@ -4,7 +4,7 @@ import { getManager } from 'typeorm';
 import { UserEntity } from '../../models/UserEntity';
 import { Request, Response } from 'express';
 
-export const userUpdateSchema = {
+const userUpdateSchema = {
     user: {
         email: Optional(Primitive(String)),
         password: Optional(Primitive(String)),
