@@ -1,9 +1,8 @@
-import { Optional, Primitive } from 'validate-typescript';
-import { UserResponse, getSaltHash, getToken } from './shared';
-import { resultFactory } from '../../util';
-import { EntityManager } from 'typeorm';
-import { CurrentUser } from '../../types';
+import { Optional, Primitive, validate } from 'validate-typescript';
+import { getSaltHash, getToken } from './shared';
+import { getManager } from 'typeorm';
 import { UserEntity } from '../../models/UserEntity';
+import { Request, Response } from 'express';
 
 export const userUpdateSchema = {
     user: {
@@ -15,17 +14,10 @@ export const userUpdateSchema = {
     },
 };
 
-interface UserUpdateResults {
-    success: UserResponse;
-}
-
-const result = resultFactory<UserUpdateResults>();
-
-export async function handleUserUpdate(
-    currentUser: CurrentUser,
-    manager: EntityManager,
-    userUpdate: typeof userUpdateSchema,
-) {
+export async function update(req: Request, res: Response) {
+    const currentUser = req.user;
+    const userUpdate = validate(userUpdateSchema, req.body);
+    const manager = getManager();
     const { id } = currentUser;
     const {
         email,
@@ -63,11 +55,14 @@ export async function handleUserUpdate(
 
     const savedUser = await manager.save(user);
     const token = getToken(savedUser);
-    return result('success', {
-        username: savedUser.username,
-        token,
-        email: savedUser.email,
-        bio: savedUser.bio,
-        image: savedUser.image,
+
+    res.status(200).json({
+        user: {
+            username: savedUser.username,
+            token,
+            email: savedUser.email,
+            bio: savedUser.bio,
+            image: savedUser.image,
+        }
     });
 }

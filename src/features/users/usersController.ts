@@ -3,10 +3,10 @@ import { auth } from '../../auth';
 import { handleGetUser } from './get';
 import { getManager } from 'typeorm';
 import { validate } from 'validate-typescript';
-import { userRegisterSchema, handleUserRegister } from './register';
+import { userRegisterSchema, register } from './register';
 import { userLoginSchema, handleUserLogin } from './login';
 import { UserResponse } from './shared';
-import { userUpdateSchema, handleUserUpdate } from './update';
+import { userUpdateSchema, update } from './update';
 
 const usersController = Router();
 
@@ -15,21 +15,7 @@ usersController.get('/', auth.required, async (req, res) => {
     res.status(200).json(user(response));
 });
 
-usersController.post('/', async (req, res) => {
-    const userRegistration = validate(userRegisterSchema, req.body);
-    const response = await handleUserRegister(getManager(), userRegistration);
-    switch (response.type) {
-        case 'success':
-            res.status(200).json(user(response));
-            break;
-        case 'emailTaken':
-            res.status(422).json(error('email taken'));
-            break;
-        case 'usernameTaken':
-            res.status(422).json(error(`The username '${response.payload.username}' is taken.`));
-            break;
-    }
-});
+usersController.post('/', register);
 
 usersController.post('/login', async (req, res) => {
     const userLogin = validate(userLoginSchema, req.body);
@@ -47,19 +33,7 @@ usersController.post('/login', async (req, res) => {
     }
 });
 
-usersController.put('/', auth.required, async (req, res) => {
-    const userUpdate = validate(userUpdateSchema, req.body);
-    const response = await handleUserUpdate(
-        req.user,
-        getManager(),
-        userUpdate,
-    );
-    switch(response.type) {
-        case 'success':
-            res.status(200).json(user(response));
-            break;
-    }
-})
+usersController.put('/', auth.required, update);
 
 function user({ payload }: { payload: UserResponse }) {
     return { user: payload };

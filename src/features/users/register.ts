@@ -1,8 +1,8 @@
-import { Primitive } from 'validate-typescript';
-import { EntityManager } from 'typeorm';
+import { Primitive, validate } from 'validate-typescript';
+import { getManager } from 'typeorm';
 import { UserEntity } from '../../models/UserEntity';
-import { getSaltHash, getToken, UserResponse } from './shared';
-import { resultFactory } from '../../util';
+import { getSaltHash, getToken } from './shared';
+import { Request, Response } from 'express';
 
 export const userRegisterSchema = {
     user: {
@@ -12,22 +12,10 @@ export const userRegisterSchema = {
     }
 };
 
-interface UserRegisterResults {
-    success: UserResponse;
-    usernameTaken: {
-        username: string;
-    };
-    emailTaken: {
-        email: string;
-    };
-}
+export async function register(req: Request, res: Response) {
+    const userRegister = validate(userRegisterSchema, req.body);
+    const manager = getManager();
 
-const result = resultFactory<UserRegisterResults>();
-
-export async function handleUserRegister(
-    manager: EntityManager,
-    userRegister: typeof userRegisterSchema,
-) {
     const {
         username,
         password,
@@ -42,7 +30,7 @@ export async function handleUserRegister(
         { username },
     );
     if (existingByUsername) {
-        return result('usernameTaken', { username });
+        return res.status(422).json({ errors: { body: [`The username '${username}' is taken.`] } });
     }
 
     const existingByEmail = await manager.findOne(
@@ -50,7 +38,7 @@ export async function handleUserRegister(
         { email },
     );
     if (existingByEmail) {
-        return result('emailTaken', { email });
+        return res.status(422).json({ errors: { body: ['email is taken'] } });
     }
 
     const {
@@ -63,11 +51,13 @@ export async function handleUserRegister(
     const user = await manager.save(createdUser);
 
     const token = getToken(user);
-    return result('success', {
-        username,
-        token,
-        email,
-        bio,
-        image,
+    return res.status(200).json({
+        user: {
+            username,
+            token,
+            email,
+            bio,
+            image,
+        },
     });
 }
