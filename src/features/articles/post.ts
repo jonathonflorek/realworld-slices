@@ -1,10 +1,9 @@
-import { Primitive } from 'validate-typescript';
-import { resultFactory } from '../../util';
+import { Primitive, validate } from 'validate-typescript';
 import { ArticleEntity } from '../../models/ArticleEntity';
-import { CurrentUser } from '../../types';
 import * as slug from 'slug';
-import { EntityManager } from 'typeorm';
+import { getManager } from 'typeorm';
 import { UserEntity } from '../../models/UserEntity';
+import { Request, Response } from 'express';
 
 export const articlePostSchema = {
     article: {
@@ -14,12 +13,6 @@ export const articlePostSchema = {
         tagList: [Primitive(String)],
     },
 };
-
-interface ArticlePostResults {
-    success: {
-        article: ArticleDto;
-    };
-}
 
 interface ArticleDto {
     slug: string;
@@ -41,13 +34,11 @@ interface ProfileDto {
     following: boolean;
 }
 
-const result = resultFactory<ArticlePostResults>();
+export async function post(req: Request, res: Response) {
+    const currentUser = req.user;
+    const articlePost = validate(articlePostSchema, req.body);
+    const manager = getManager();
 
-export async function handleArticlePost(
-    currentUser: CurrentUser,
-    manager: EntityManager,
-    articlePost: typeof articlePostSchema,
-) {
     const now = new Date();
     const author = await manager.findOne(UserEntity, { id: currentUser.id });
     if (author === undefined) {
@@ -67,7 +58,7 @@ export async function handleArticlePost(
 
     await manager.save(article);
 
-    return result('success', {
+    return res.status(200).json({
         article: getArticleDto(article),
     });
 }
