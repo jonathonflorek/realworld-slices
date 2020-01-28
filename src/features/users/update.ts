@@ -1,23 +1,34 @@
-import { Optional, Primitive, validate } from 'validate-typescript';
 import { getSaltHash, getToken } from './shared';
 import { getManager } from 'typeorm';
 import { UserEntity } from '../../models/UserEntity';
 import { Request, Response } from 'express';
 
-const userUpdateSchema = {
-    user: {
-        email: Optional(Primitive(String)),
-        password: Optional(Primitive(String)),
-        username: Optional(Primitive(String)),
-        bio: Optional(Primitive(String)),
-        image: Optional(Primitive(String)),
-    },
-};
+import * as t from 'io-ts';
+import { either } from 'fp-ts';
+import { failure } from 'io-ts/lib/PathReporter'
+
+const UserUpdate = t.strict({
+    user: t.exact(t.partial({
+        email: t.string,
+        password: t.string,
+        username: t.string,
+        bio: t.string,
+        image: t.string,
+    })),
+});
 
 export async function update(req: Request, res: Response) {
     const currentUser = req.user;
-    const userUpdate = validate(userUpdateSchema, req.body);
     const manager = getManager();
+
+    const userUpdate = UserUpdate.decode(req.body);
+
+    if (either.isLeft(userUpdate)) {
+        return res.status(422).json({
+            errors: { body: failure(userUpdate.left) },
+        });
+    }
+
     const { id } = currentUser;
     const {
         email,
@@ -25,7 +36,7 @@ export async function update(req: Request, res: Response) {
         username,
         bio,
         image,
-    } = userUpdate.user;
+    } = userUpdate.right.user;
 
     const user = await manager.findOne(UserEntity, { id });
 

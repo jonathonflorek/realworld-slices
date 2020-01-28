@@ -1,23 +1,33 @@
-import { Primitive, validate } from 'validate-typescript';
 import { ArticleEntity } from '../../models/ArticleEntity';
 import * as slug from 'slug';
 import { getManager } from 'typeorm';
 import { UserEntity } from '../../models/UserEntity';
 import { Request, Response } from 'express';
 
-export const articlePostSchema = {
-    article: {
-        title: Primitive(String),
-        description: Primitive(String),
-        body: Primitive(String),
-        tagList: [Primitive(String)],
-    },
-};
+import * as t from 'io-ts';
+import { either } from 'fp-ts';
+import { failure } from 'io-ts/lib/PathReporter'
+
+const ArticlePost = t.strict({
+    article: t.strict({
+        title: t.string,
+        description: t.string,
+        body: t.string,
+        tagList: t.array(t.string),
+    }),
+});
 
 export async function post(req: Request, res: Response) {
     const currentUser = req.user;
-    const articlePost = validate(articlePostSchema, req.body);
     const manager = getManager();
+
+    const articlePost = ArticlePost.decode(req.body);
+
+    if (either.isLeft(articlePost)) {
+        return res.status(422).json({
+            errors: { body: failure(articlePost.left) },
+        });
+    }
 
     const now = new Date();
     const author = await manager.findOne(UserEntity, { id: currentUser.id });
@@ -25,7 +35,7 @@ export async function post(req: Request, res: Response) {
         throw new Error(`current user does not exist`);
     }
 
-    const data = articlePost.article;
+    const data = articlePost.right.article;
     const article = new ArticleEntity();
     article.title = data.title;
     article.description = data.description;

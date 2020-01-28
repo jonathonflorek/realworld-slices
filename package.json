@@ -30,8 +30,7 @@
     "pg": "^7.17.1",
     "reflect-metadata": "^0.1.13",
     "slug": "^2.1.0",
-    "typeorm": "^0.2.22",
-    "validate-typescript": "^4.0.2"
+    "typeorm": "^0.2.22"
   },
   "devDependencies": {
     "@types/chai": "^4.2.7",
