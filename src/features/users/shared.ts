@@ -53,11 +53,3 @@ function getTokenExpiry() {
     exp.setDate(today.getDate() + 60);
     return exp.getTime() / 1000;
 }
-
-export interface UserResponse {
-    username: string;
-    token: string;
-    email: string;
-    bio: string;
-    image: string;
-}

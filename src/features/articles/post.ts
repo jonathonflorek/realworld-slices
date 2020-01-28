@@ -14,26 +14,6 @@ export const articlePostSchema = {
     },
 };
 
-interface ArticleDto {
-    slug: string;
-    title: string;
-    description: string;
-    body: string;
-    tagList: string[];
-    createdAt: Date;
-    updatedAt: Date;
-    favorited: boolean;
-    favoritesCount: number;
-    author: ProfileDto;
-}
-
-interface ProfileDto {
-    username: string;
-    bio: string;
-    image: string;
-    following: boolean;
-}
-
 export async function post(req: Request, res: Response) {
     const currentUser = req.user;
     const articlePost = validate(articlePostSchema, req.body);
@@ -67,7 +47,7 @@ function getSlug(title: string) {
     return slug(title, {lower: true}) + '-' + (Math.random() * Math.pow(36, 6) | 0).toString(36);
 }
 
-function getArticleDto(entity: ArticleEntity): ArticleDto {
+function getArticleDto(entity: ArticleEntity) {
     return {
         slug: entity.slug,
         title: entity.title,
@@ -82,7 +62,7 @@ function getArticleDto(entity: ArticleEntity): ArticleDto {
     };
 }
 
-function getProfileDto(user: UserEntity): ProfileDto {
+function getProfileDto(user: UserEntity) {
     return {
         username: user.username,
         bio: user.bio,
