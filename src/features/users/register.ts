@@ -1,26 +1,36 @@
-import { Primitive, validate } from 'validate-typescript';
 import { getManager } from 'typeorm';
 import { UserEntity } from '../../models/UserEntity';
 import { getSaltHash, getToken } from './shared';
 import { Request, Response } from 'express';
 
-const userRegisterSchema = {
-    user: {
-        username: Primitive(String),
-        email: Primitive(String),
-        password: Primitive(String),
-    }
-};
+import * as t from 'io-ts';
+import { either } from 'fp-ts';
+import { failure } from 'io-ts/lib/PathReporter'
+
+const UserRegister = t.strict({
+    user: t.strict({
+        username: t.string,
+        email: t.string,
+        password: t.string,
+    }),
+});
 
 export async function register(req: Request, res: Response) {
-    const userRegister = validate(userRegisterSchema, req.body);
     const manager = getManager();
+
+    const userRegister = UserRegister.decode(req.body);
+
+    if (either.isLeft(userRegister)) {
+        return res.status(422).json({
+            errors: { body: failure(userRegister.left) },
+        });
+    }
 
     const {
         username,
         password,
         email,
-    } = userRegister.user;
+    } = userRegister.right.user;
 
     const bio = '';
     const image = '';
@@ -30,7 +40,9 @@ export async function register(req: Request, res: Response) {
         { username },
     );
     if (existingByUsername) {
-        return res.status(422).json({ errors: { body: [`The username '${username}' is taken.`] } });
+        return res.status(422).json({
+            errors: { body: [`The username '${username}' is taken.`] },
+        });
     }
 
     const existingByEmail = await manager.findOne(
@@ -38,7 +50,9 @@ export async function register(req: Request, res: Response) {
         { email },
     );
     if (existingByEmail) {
-        return res.status(422).json({ errors: { body: ['email is taken'] } });
+        return res.status(422).json({
+            errors: { body: ['email is taken'] },
+        });
     }
 
     const {
