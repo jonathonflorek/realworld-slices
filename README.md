@@ -25,7 +25,7 @@ TypeORM is configured to use the same environment variables in `/.env` as the ru
 
 ## How is this SRP in SOLID?
 
-Lasagne architecture suffers from a problem where repositories need to return different columns of an object depending on what it's used for. For example:
+Lasagna architecture suffers from a problem where repositories need to return different columns of an object depending on what it's used for. For example:
 
 ```
 interface SampleRepository {
